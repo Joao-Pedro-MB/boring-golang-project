@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.3.0] - 2022-12-17
+
+### Added
+
+- static files and html templates
+
+### Changed
+
+- home funtion in handlers.go
+
 ## [0.2.1] - 2022-12-17
 
 ### Changed

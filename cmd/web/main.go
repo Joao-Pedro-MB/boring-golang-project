@@ -11,8 +11,14 @@ func main() {
 	// OBS: i am no t using default servermux and http.HandleFunc
 	// to avoid a global scope servermux
 	mux := http.NewServeMux()
+
+	fileServer := http.FileServer(http.Dir("./ui/static/"))
+
+	// registering the file server as the handler
+	mux.Handle("/static/", http.StripPrefix("/static", fileServer))
+
 	mux.HandleFunc("/", home)
-	mux.HandleFunc("/message/view", messageView)
+	mux.HandleFunc("/message/view/{id}", messageView)
 	mux.HandleFunc("/message/create", messageCreate)
 
 	// start server on localhost port 4000. Albeit,
