@@ -1,6 +1,16 @@
 # Changelog
 
-## [0.1.0] - 2019-02-15
+## [0.2.0] - 2022-12-17
+
+### Added
+
+- create and view pages
+
+### Changed
+
+- home page funtion to implement route restriction
+
+## [0.1.0] - 2022-12-17
 
 ### Added
 
