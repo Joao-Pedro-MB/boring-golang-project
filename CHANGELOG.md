@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.3.1] - 2022-12-17
+
+### Added
+
+- env var and flags
+- error and info logs
+- MySQL database
+- centralized error handling
+
 ## [0.3.0] - 2022-12-17
 
 ### Added

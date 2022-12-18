@@ -1,32 +1,83 @@
 package main
 
 import (
+	"database/sql"
+	"flag"
 	"log"
 	"net/http"
+	"os"
+
+	"github.com/Joao-Pedro-MB/boring-golang-project/internal/models"
+	_ "github.com/go-sql-driver/mysql" // New import
+	"github.com/spf13/viper"
 )
 
+type application struct {
+	errorLog *log.Logger
+	infoLog  *log.Logger
+	messages *models.MessageModel
+}
+
+// this whole function is just a exageration to practice th usage of a .env file
+func viperEnvVariable(key string) string {
+
+	viper.SetConfigFile("dev.env")
+
+	err := viper.ReadInConfig()
+
+	if err != nil {
+		log.Fatalf("Error while reading config file %s", err)
+	}
+
+	value, ok := viper.Get(key).(string)
+
+	if !ok {
+		log.Fatalf("Invalid type assertion")
+	}
+
+	return value
+}
+
 func main() {
+	default_addr := viperEnvVariable("DEFAULT_ADDR")
+	addr := flag.String("addr", default_addr, "HTTP network address")
+	flag.Parse()
 
-	// init server multiplexer and add page routes funtion
-	// OBS: i am no t using default servermux and http.HandleFunc
-	// to avoid a global scope servermux
-	mux := http.NewServeMux()
+	infoLog := log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime)
+	errorLog := log.New(os.Stderr, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile)
 
-	fileServer := http.FileServer(http.Dir("./ui/static/"))
+	dsn := flag.String("dsn", "user:password@/boringProject?parseTime=true", "MySQL data source name")
+	db, err := openDB(*dsn)
+	if err != nil {
+		errorLog.Fatal(err)
+	}
 
-	// registering the file server as the handler
-	mux.Handle("/static/", http.StripPrefix("/static", fileServer))
+	defer db.Close()
 
-	mux.HandleFunc("/", home)
-	mux.HandleFunc("/message/view/{id}", messageView)
-	mux.HandleFunc("/message/create", messageCreate)
+	app := &application{
+		errorLog: errorLog,
+		infoLog:  infoLog,
+		messages: &models.MessageModel{DB: db},
+	}
 
-	// start server on localhost port 4000. Albeit,
-	// as I did not specified host, so the app is listening
-	// to port 4000 in every computer network interface.
+	srv := &http.Server{
+		Addr:     *addr,
+		ErrorLog: errorLog,
+		Handler:  app.routes(),
+	}
 
-	// I can also use an alias as port name
-	log.Print("Starting server on :4000")
-	err := http.ListenAndServe(":4000", mux)
-	log.Fatal(err)
+	infoLog.Printf("Starting server on %s", *addr)
+	err = srv.ListenAndServe()
+	errorLog.Fatal(err)
+}
+
+func openDB(dsn string) (*sql.DB, error) {
+	db, err := sql.Open("mysql", dsn)
+	if err != nil {
+		return nil, err
+	}
+	if err = db.Ping(); err != nil {
+		return nil, err
+	}
+	return db, nil
 }
