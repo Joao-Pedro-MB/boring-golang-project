@@ -2,5 +2,22 @@
 
 {{define "main"}}
     <h2>Latest Messages</h2>
-    <p>There's nothing to see here yet!</p>
+    {{if .Messages}}
+     <table>
+        <tr>
+            <th>Title</th>
+            <th>Created</th>
+            <th>ID</th>
+        </tr>
+        {{range .Messages}}
+        <tr>
+            <td><a href='/message/view?id={{.ID}}'>{{.Title}}</a></td>
+            <td>{{.Created | humanDate}}</td>
+            <td>#{{.ID}}</td>
+        </tr>
+        {{end}}
+    </table>
+    {{else}}
+        <p>There's nothing to see here... yet!</p>
+    {{end}}
 {{end}}
