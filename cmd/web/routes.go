@@ -4,23 +4,28 @@ import (
 	"net/http"
 	"path/filepath"
 
+	"github.com/julienschmidt/httprouter"
 	"github.com/justinas/alice"
 )
 
 func (app *application) routes() http.Handler {
-	mux := http.NewServeMux()
+	router := httprouter.New()
 
-	fileServer := http.FileServer(neuteredFileSystem{http.Dir("./ui/static")})
-	mux.Handle("/static/", http.StripPrefix("/static", fileServer))
+	router.NotFound = http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		app.notFound(w)
+	})
 
-	mux.HandleFunc("/", app.home)
-	mux.HandleFunc("/message/view", app.messageView)
-	mux.HandleFunc("/message/create", app.messageCreate)
+	fileServer := http.FileServer(http.Dir("./ui/static/"))
+	router.Handler(http.MethodGet, "/static/*filepath", http.StripPrefix("/static", fileServer))
 
-	// pretty way to write a chain of middlewares
+	router.HandlerFunc(http.MethodGet, "/", app.home)
+	router.HandlerFunc(http.MethodGet, "/message/view/:id", app.messageView)
+	router.HandlerFunc(http.MethodGet, "/message/create", app.messageCreate)
+	router.HandlerFunc(http.MethodPost, "/message/create", app.messageCreatePost)
+
 	standard := alice.New(app.recoverPanic, app.logRequest, secureHeaders)
 
-	return standard.Then(mux)
+	return standard.Then(router)
 }
 
 type neuteredFileSystem struct {
