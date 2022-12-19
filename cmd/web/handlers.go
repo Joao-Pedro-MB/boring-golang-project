@@ -12,15 +12,24 @@ import (
 
 func (app *application) home(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path != "/" {
-		http.NotFound(w, r)
+		app.notFound(w)
 		return
 	}
 
-	// Include the navigation partial in the template files.
+	messages, err := app.messages.Latest()
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+
+	for _, message := range messages {
+		fmt.Fprintf(w, "%+v\n", message)
+	}
+
 	files := []string{
-		"./ui/html/base.html",
-		"./ui/html/partials/nav.html",
-		"./ui/html/pages/home.html",
+		"./ui/html/base.tmpl",
+		"./ui/html/partials/nav.tmpl",
+		"./ui/html/pages/home.tmpl",
 	}
 
 	ts, err := template.ParseFiles(files...)

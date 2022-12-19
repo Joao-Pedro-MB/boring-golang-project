@@ -52,5 +52,33 @@ func (m *MessageModel) Get(id int) (*Message, error) {
 }
 
 func (m *MessageModel) Latest() ([]*Message, error) {
-	return nil, nil
+
+	stmt := `SELECT id, title, content, created, expires FROM messages
+    WHERE expires > UTC_TIMESTAMP() ORDER BY id DESC LIMIT 10`
+
+	rows, err := m.DB.Query(stmt)
+	if err != nil {
+		return nil, err
+	}
+
+	defer rows.Close()
+
+	messages := []*Message{}
+
+	for rows.Next() {
+
+		s := &Message{}
+
+		err = rows.Scan(&s.ID, &s.Title, &s.Content, &s.Created, &s.Expires)
+		if err != nil {
+			return nil, err
+		}
+
+		messages = append(messages, s)
+	}
+
+	if err = rows.Err(); err != nil {
+		return nil, err
+	}
+	return messages, nil
 }
