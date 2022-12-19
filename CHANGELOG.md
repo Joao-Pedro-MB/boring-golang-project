@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.3.2] - 2022-12-19
+
+### Added
+
+- panic, log and securityHeader middlewares
+
 ## [0.3.1] - 2022-12-18
 
 ### Added

@@ -3,6 +3,8 @@ package main
 import (
 	"net/http"
 	"path/filepath"
+
+	"github.com/justinas/alice"
 )
 
 func (app *application) routes() http.Handler {
@@ -15,7 +17,10 @@ func (app *application) routes() http.Handler {
 	mux.HandleFunc("/message/view", app.messageView)
 	mux.HandleFunc("/message/create", app.messageCreate)
 
-	return secureHeaders(mux)
+	// pretty way to write a chain of middlewares
+	standard := alice.New(app.recoverPanic, app.logRequest, secureHeaders)
+
+	return standard.Then(mux)
 }
 
 type neuteredFileSystem struct {
