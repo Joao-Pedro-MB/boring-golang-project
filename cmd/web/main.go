@@ -21,7 +21,7 @@ type application struct {
 // this whole function is just a exageration to practice th usage of a .env file
 func viperEnvVariable(key string) string {
 
-	viper.SetConfigFile("dev.env")
+	viper.SetConfigFile("../../dev.env")
 
 	err := viper.ReadInConfig()
 

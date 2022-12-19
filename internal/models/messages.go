@@ -2,6 +2,7 @@ package models
 
 import (
 	"database/sql"
+	"errors"
 	"time"
 )
 
@@ -36,7 +37,18 @@ func (m *MessageModel) Insert(title string, content string, expires int) (int, e
 }
 
 func (m *MessageModel) Get(id int) (*Message, error) {
-	return nil, nil
+	stmt := `SELECT id, title, content, created, expires FROM messages WHERE expires > UTC_TIMESTAMP() AND id = ?;`
+	row := m.DB.QueryRow(stmt, id)
+	s := &Message{}
+	err := row.Scan(&s.ID, &s.Title, &s.Content, &s.Created, &s.Expires)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, ErrNoRecord
+		} else {
+			return nil, err
+		}
+	}
+	return s, nil
 }
 
 func (m *MessageModel) Latest() ([]*Message, error) {
