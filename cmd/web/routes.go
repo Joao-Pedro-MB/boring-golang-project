@@ -5,7 +5,7 @@ import (
 	"path/filepath"
 )
 
-func (app *application) routes() *http.ServeMux {
+func (app *application) routes() http.Handler {
 	mux := http.NewServeMux()
 
 	fileServer := http.FileServer(neuteredFileSystem{http.Dir("./ui/static")})
@@ -15,7 +15,7 @@ func (app *application) routes() *http.ServeMux {
 	mux.HandleFunc("/message/view", app.messageView)
 	mux.HandleFunc("/message/create", app.messageCreate)
 
-	return mux
+	return secureHeaders(mux)
 }
 
 type neuteredFileSystem struct {
@@ -29,6 +29,9 @@ func (nfs neuteredFileSystem) Open(path string) (http.File, error) {
 	}
 
 	s, err := f.Stat()
+	if err != nil {
+		return nil, err
+	}
 
 	if s.IsDir() {
 		index := filepath.Join(path, "index.html")
