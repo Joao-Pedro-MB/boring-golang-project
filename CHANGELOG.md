@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.0] - 2022-12-22
+
+### Added
+
+- message creation forms
+
+
 ## [0.3.2] - 2022-12-19
 
 ### Added

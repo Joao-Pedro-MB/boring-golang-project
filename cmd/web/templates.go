@@ -12,6 +12,7 @@ type templateData struct {
 	CurrentYear int
 	Message     *models.Message
 	Messages    []*models.Message
+	Form        any
 }
 
 var functions = template.FuncMap{

@@ -9,6 +9,7 @@ import (
 	"os"
 
 	"github.com/Joao-Pedro-MB/boring-golang-project/internal/models"
+	"github.com/go-playground/form/v4"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/spf13/viper"
 )
@@ -18,6 +19,7 @@ type application struct {
 	infoLog       *log.Logger
 	messages      *models.MessageModel
 	templateCache map[string]*template.Template
+	formDecoder   *form.Decoder
 }
 
 // this whole function is just a exageration to practice th usage of a .env file
@@ -61,11 +63,14 @@ func main() {
 		errorLog.Fatal(err)
 	}
 
+	formDecoder := form.NewDecoder()
+
 	app := &application{
 		errorLog:      errorLog,
 		infoLog:       infoLog,
 		messages:      &models.MessageModel{DB: db},
 		templateCache: templateCache,
+		formDecoder:   formDecoder,
 	}
 
 	srv := &http.Server{
