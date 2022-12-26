@@ -13,6 +13,7 @@ type templateData struct {
 	Message     *models.Message
 	Messages    []*models.Message
 	Form        any
+	Flash       string
 }
 
 var functions = template.FuncMap{

@@ -93,5 +93,7 @@ func (app *application) messageCreatePost(w http.ResponseWriter, r *http.Request
 		return
 	}
 
+	app.sessionManager.Put(r.Context(), "flash", "Message successfully created!")
+
 	http.Redirect(w, r, fmt.Sprintf("/message/view/%d", id), http.StatusSeeOther)
 }

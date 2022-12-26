@@ -8,6 +8,8 @@ require (
 )
 
 require (
+	github.com/alexedwards/scs/mysqlstore v0.0.0-20221223131519-238b052508b6 // indirect
+	github.com/alexedwards/scs/v2 v2.5.0 // indirect
 	github.com/fsnotify/fsnotify v1.6.0 // indirect
 	github.com/go-playground/form v3.1.4+incompatible // indirect
 	github.com/go-playground/form/v4 v4.2.0 // indirect

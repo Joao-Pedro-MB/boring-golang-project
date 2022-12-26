@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.5.0] - 2022-12-26
+
+### Added
+
+- session management
+- flashcard showing the message was successfully created
+
+
 ## [0.4.0] - 2022-12-22
 
 ### Added
