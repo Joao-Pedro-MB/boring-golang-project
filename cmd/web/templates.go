@@ -9,11 +9,13 @@ import (
 )
 
 type templateData struct {
-	CurrentYear int
-	Message     *models.Message
-	Messages    []*models.Message
-	Form        any
-	Flash       string
+	CurrentYear     int
+	Message         *models.Message
+	Messages        []*models.Message
+	Form            any
+	Flash           string
+	IsAuthenticated bool
+	CSRFToken       string
 }
 
 var functions = template.FuncMap{
