@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.6.0] - 2023-01-08
+
+### Added
+- unit tests
+- end to end tests
+- session management
+
+### Changed
+- Returned to HTTP server due to unknown TLS problem with firefox browser
+
 ## [0.5.0] - 2022-12-26
 
 ### Added

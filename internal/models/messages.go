@@ -6,6 +6,12 @@ import (
 	"time"
 )
 
+type MessageModelInterface interface {
+	Insert(title string, content string, expires int) (int, error)
+	Get(id int) (*Message, error)
+	Latest() ([]*Message, error)
+}
+
 type Message struct {
 	ID      int
 	Title   string
@@ -19,7 +25,6 @@ type MessageModel struct {
 }
 
 func (m *MessageModel) Insert(title string, content string, expires int) (int, error) {
-
 	stmt := `INSERT INTO messages (title, content, created, expires)
     VALUES(?, ?, UTC_TIMESTAMP(), DATE_ADD(UTC_TIMESTAMP(), INTERVAL ? DAY))`
 
@@ -37,9 +42,13 @@ func (m *MessageModel) Insert(title string, content string, expires int) (int, e
 }
 
 func (m *MessageModel) Get(id int) (*Message, error) {
-	stmt := `SELECT id, title, content, created, expires FROM messages WHERE expires > UTC_TIMESTAMP() AND id = ?;`
+	stmt := `SELECT id, title, content, created, expires FROM messages
+    WHERE expires > UTC_TIMESTAMP() AND id = ?`
+
 	row := m.DB.QueryRow(stmt, id)
+
 	s := &Message{}
+
 	err := row.Scan(&s.ID, &s.Title, &s.Content, &s.Created, &s.Expires)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
@@ -48,25 +57,23 @@ func (m *MessageModel) Get(id int) (*Message, error) {
 			return nil, err
 		}
 	}
+
 	return s, nil
 }
 
 func (m *MessageModel) Latest() ([]*Message, error) {
-
 	stmt := `SELECT id, title, content, created, expires FROM messages
-    WHERE expires > UTC_TIMESTAMP() ORDER BY id DESC LIMIT 10`
+    ORDER BY id DESC LIMIT 10`
 
 	rows, err := m.DB.Query(stmt)
 	if err != nil {
 		return nil, err
 	}
-
 	defer rows.Close()
 
 	messages := []*Message{}
 
 	for rows.Next() {
-
 		s := &Message{}
 
 		err = rows.Scan(&s.ID, &s.Title, &s.Content, &s.Created, &s.Expires)
@@ -80,5 +87,6 @@ func (m *MessageModel) Latest() ([]*Message, error) {
 	if err = rows.Err(); err != nil {
 		return nil, err
 	}
+
 	return messages, nil
 }
